@@ -1,0 +1,23 @@
+{
+  "package_id": "opencode-offsec-merged",
+  "release": "4.6.4-merged.6-runtime-patch4-lean",
+  "base_release": "4.6.4-merged.6-runtime-patch3",
+  "registry": "pentest/agents/v4-index.json",
+  "main_agent": "offsec-v4-operator",
+  "active_agents": 17,
+  "active_skills": 25,
+  "reference_playbooks": 155,
+  "python_min": "3.10",
+  "installer": "INSTALL.py",
+  "rules": "FRAMEWORK_RULES.md",
+  "supported_target": "OpenCode V2",
+  "target_opencode_version": "2.3.2",
+  "native_plugin_v1_supported": false,
+  "patch_notes": "README_PUBLIC_RELEASE.md",
+  "installer_agent": "any local assistant with filesystem and command access",
+  "automatic_general_poc_validation": false,
+  "optional_integrations_autostart": false,
+  "package_flavor": "runtime-only",
+  "development_tests_included": false,
+  "optional_services_included": false
+}

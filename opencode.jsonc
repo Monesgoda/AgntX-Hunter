@@ -1,0 +1,25 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "offsec-v4-operator",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  // Last matching rule wins. Generic shell use is asked about; the framework's
+  // central gateway is explicitly allowed; direct DB/network tools are denied so
+  // an agent cannot bypass scope, budgets, fencing or evidence sealing.
+  "permissions": [
+    { "action": "shell", "resource": "*", "effect": "ask" },
+    { "action": "shell", "resource": "python -m pentest.framework.cli *", "effect": "allow" },
+    { "action": "shell", "resource": "python3 -m pentest.framework.cli *", "effect": "allow" },
+    { "action": "shell", "resource": "python -m pentest.framework.cli", "effect": "allow" },
+    { "action": "shell", "resource": "python3 -m pentest.framework.cli", "effect": "allow" },
+    { "action": "shell", "resource": "sqlite3 *", "effect": "deny" },
+    { "action": "shell", "resource": "curl *", "effect": "deny" },
+    { "action": "shell", "resource": "wget *", "effect": "deny" },
+    { "action": "shell", "resource": "nc *", "effect": "deny" },
+    { "action": "shell", "resource": "ncat *", "effect": "deny" },
+    { "action": "shell", "resource": "ssh *", "effect": "deny" },
+    { "action": "shell", "resource": "psql *", "effect": "deny" },
+    { "action": "shell", "resource": "mysql *", "effect": "deny" }
+  ]
+}
