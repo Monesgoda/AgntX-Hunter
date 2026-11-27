@@ -360,6 +360,58 @@ A single dependency-free V2 plugin (`offsec-context.js`) ships with the runtime:
 
 ---
 
+## 🔌 Connector: NotHoly (models + MCP)
+
+[NotHoly](https://notholy.com) provides uncensored and abliterated models for offensive security: reverse engineering of apps and binaries, pentest, bug bounty, red team, malware analysis, vulnerability research and OSINT. Abliterated means the refusal behavior was removed from an open model's weights. One API key covers both parts:
+
+| Part | Endpoint | What you get |
+|---|---|---|
+| **Models** | `https://api.notholy.com/v1` | OpenAI-compatible (and Anthropic-compatible) chat API |
+| **MCP server** | `https://api.notholy.com/mcp` | CKE 2.0, a curated offensive-security knowledge base (`cke_search`, `cke_read`, `cke_related`), CVE and advisory lookups (`vuln_lookup`, `vuln_search`, `vuln_advisories`) and other research tools |
+
+AgntX-Hunter ships no provider settings, so this goes in your own OpenCode config, which `INSTALL.py` and `SETUP_V4.py` leave alone. Add it to the global file, `~/.config/opencode/opencode.json` (`%USERPROFILE%\.config\opencode\opencode.json` on Windows), next to any providers you already have:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "notholy/<model-id>",
+  "providers": {
+    "notholy": {
+      "name": "NotHoly",
+      "env": ["NOTHOLY_API_KEY"],
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": { "baseURL": "https://api.notholy.com/v1" },
+      "models": {
+        "<model-id>": { "capabilities": { "tools": true } }
+      }
+    }
+  },
+  "mcp": {
+    "notholy": {
+      "type": "remote",
+      "url": "https://api.notholy.com/mcp",
+      "headers": { "Authorization": "Bearer {env:NOTHOLY_API_KEY}" }
+    }
+  }
+}
+```
+
+Model IDs, context sizes and output limits come from the live catalog, which needs no key: `curl https://api.notholy.com/v1/models`. Put the ID you want in place of `<model-id>`. The list changes over time, so it is not copied here.
+
+OpenCode 2 sends model requests from its background service, and that service reads the key from its own environment. Store it there once, then check both parts:
+
+```bash
+opencode service set env NOTHOLY_API_KEY <your-key>
+opencode models notholy
+opencode mcp list
+```
+
+- **Dispatched workers.** The dispatcher strips unknown variables from each worker's environment (`pentest/framework/process_runtime.py`). A key stored in the OpenCode service is not affected. If you run OpenCode standalone and the key comes from your shell, add `"extra_passthrough_env": ["NOTHOLY_API_KEY"]` to the engagement in `pentest/scope.json`.
+- **MCP traffic is outside the scope gateway.** The MCP tools run on NotHoly's side, not through the fenced HTTP gateway. Most are passive lookups. `recon_ports` is the exception: it sends a TCP port scan to the host you give it. Turn that tool off in OpenCode for engagements that don't allow scanning.
+- **OpenCode 1** (`opencode-ai` on npm) uses a `provider` block instead of `providers`. The [NotHoly OpenCode guide](https://docs.notholy.com/en/integrations/opencode) has both versions, and the [MCP reference](https://docs.notholy.com/en/mcp/remote) lists every tool.
+
+---
+
 ## 📚 Documentation Map
 
 | Document | Purpose |
