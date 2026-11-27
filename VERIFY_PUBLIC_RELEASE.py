@@ -47,6 +47,7 @@ def verify(root=ROOT,mode='strict'):
         if not p.is_file() and not p.is_symlink():continue
         rel=p.relative_to(root).as_posix()
         if rel in expected:continue
+        if rel.startswith('tests/') or '/__pycache__/' in '/'+rel:continue  # contributor test suite is not release content
         if mode=='installed' and p.suffix=='.pyc' and p.parent.name=='__pycache__':
             base=p.name.split('.cpython-')[0].split('.pypy-')[0]+'.py'
             source=(p.parent.parent/base).relative_to(root).as_posix()
